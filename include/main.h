@@ -19,11 +19,6 @@
 #include <sdcard.h>
 #include <tjpgd.h>
 
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_ERROR_TEXT
-#include <lodepng.h>
-
 
 typedef struct {
     FIL *file;

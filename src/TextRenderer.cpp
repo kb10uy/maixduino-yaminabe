@@ -24,11 +24,12 @@ int TextRenderer::loadFont(const char *imageFile, const char *tableFile) {
     }
     UINT readSize;
     void *fontFileData = malloc(imageSize);
-    if (f_read(&image, fontImage, imageSize, &readSize) != FR_OK) {
+    if (!fontFileData || f_read(&image, fontFileData, imageSize, &readSize) != FR_OK) {
         printf("Failed to read font image file!\n");
         return 1;
     }
     f_close(&image);
+    printf("Font image read.\n");
 
     // PNG デコード
     unsigned char *decoded;
@@ -44,6 +45,7 @@ int TextRenderer::loadFont(const char *imageFile, const char *tableFile) {
     fontImage = (uint8_t *) decoded;
     fontImageWidth = w;
     fontImageHeight = h;
+    printf("Font image decoded.\n");
 
     // 配置テーブル
     FIL table;
@@ -56,10 +58,12 @@ int TextRenderer::loadFont(const char *imageFile, const char *tableFile) {
         return 1;
     }
     glyphs = (GlyphInfo *) malloc(sizeof(GlyphInfo) * glyphCount);
-    if (f_read(&table, &glyphs, sizeof(GlyphInfo) * glyphCount, &readSize) != FR_OK) {
-        printf("Invalid font table file!\n");
+    if (f_read(&table, glyphs, sizeof(GlyphInfo) * glyphCount, &readSize) != FR_OK) {
+        printf("Not enough glyphs!\n");
         return 1;
     }
+    printf("Font table loaded.\n");
+    f_close(&table);
 
     return 0;
 }

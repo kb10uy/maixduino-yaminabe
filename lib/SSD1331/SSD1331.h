@@ -29,4 +29,7 @@ public:
     void setRange(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
     void drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t color);
+    void drawBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t color);
+    void drawFilledBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t color, uint16_t fillColor);
+    void copy(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t x3, uint8_t y3);
 };

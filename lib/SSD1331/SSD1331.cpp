@@ -111,3 +111,55 @@ void SSD1331::drawLine(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t 
     };
     sendCommand(command, 8);
 }
+
+/**
+ * GAC で矩形を描画する。
+ */
+void SSD1331::drawBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t color) {
+uint8_t r = (static_cast<uint8_t>(color >> 11) & 0b00011111) << 1;
+    uint8_t g = (static_cast<uint8_t>(color >> 5) & 0b00111111);
+    uint8_t b = (static_cast<uint8_t>(color) & 0b00011111) << 1;
+    uint8_t command[] = {
+        0x26, 0x00, // Fill disable
+        0x21,
+        x1, y1,
+        x2, y2,
+        r, g, b,
+        0, 0, 0
+    };
+    sendCommand(command, 13);
+}
+
+/**
+ * GAC で塗り潰し矩形を描画する。
+ */
+void SSD1331::drawFilledBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint16_t color, uint16_t fillColor) {
+    uint8_t r = (static_cast<uint8_t>(color >> 11) & 0b00011111) << 1;
+    uint8_t g = (static_cast<uint8_t>(color >> 5) & 0b00111111);
+    uint8_t b = (static_cast<uint8_t>(color) & 0b00011111) << 1;
+    uint8_t fr = (static_cast<uint8_t>(fillColor >> 11) & 0b00011111) << 1;
+    uint8_t fg = (static_cast<uint8_t>(fillColor >> 5) & 0b00111111);
+    uint8_t fb = (static_cast<uint8_t>(fillColor) & 0b00011111) << 1;
+    uint8_t command[] = {
+        0x26, 0x01, // Fill disable
+        0x21,
+        x1, y1,
+        x2, y2,
+        r, g, b,
+        fr, fg, fb
+    };
+    sendCommand(command, 13);
+}
+
+/**
+ * GAC で画面領域をコピーする。
+ */
+void SSD1331::copy(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t x3, uint8_t y3) {
+    uint8_t command[] = {
+        0x23,
+        x1, y1,
+        x2, y2,
+        x3, y3
+    };
+    sendCommand(command, 7);
+}

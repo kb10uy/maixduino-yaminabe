@@ -1,5 +1,7 @@
 #include "main.h"
 
+void *__dso_handle=0;
+
 uint8_t buffer[SSD1331_WIDTH * SSD1331_HEIGHT * 2] = {0};
 SSD1331 oled(SPI_DEVICE_1, 13, 12, 11);
 TextRenderer font(8, 12);
@@ -14,6 +16,7 @@ int main() {
     printf("OLED OK\n");
 
     initializeFatFs();
+    initializeFont();
     printf("Filesystem OK\n");
 
     while (true) showImage();
@@ -91,6 +94,7 @@ int showImage() {
         }
 
         jd_decomp(&decoder, jpegio_output, 0);
+        font.render(fileInfo.fname, 0, 0, 0b1111100000000000, buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
         oled.setRange(0, 0, 96, 64);
         oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
 
