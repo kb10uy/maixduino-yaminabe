@@ -1,5 +1,7 @@
 #include "TextRenderer.h"
 
+static uint32_t readUTF8(const uint8_t *wholeText, size_t *current);
+
 TextRenderer::TextRenderer(uint8_t fw, uint8_t fh) {
     fontWidth = fw;
     fontHeight = fh;
@@ -70,11 +72,11 @@ int TextRenderer::loadFont(const char *imageFile, const char *tableFile) {
 
 void TextRenderer::render(const char *text, uint32_t x, uint32_t y, uint16_t color, uint8_t *buffer, uint32_t bufferWidth, uint32_t bufferHeight) {
     size_t length = strlen(text);
-    // TODO: Unicode 対応する
+    size_t i = 0;
     uint32_t cx = x;
     uint32_t cy = y;
-    for (int i = 0; i < length; ++i) {
-        uint32_t cp = text[i];
+    while (i < length) {
+        uint32_t cp = readUTF8((uint8_t *) text, &i);
         if (cp == '\n') {
             cx = x;
             cy += fontHeight;
@@ -112,8 +114,40 @@ bool TextRenderer::searchGlyph(uint32_t codepoint, uint8_t *x, uint8_t *y) {
             found = true;
             break;
         }
-        target = &glyphs[target->nextChain];
+        target = glyphs + target->nextChain;
     }
 
     return found;
+}
+
+static uint32_t readUTF8(const uint8_t *wholeText, size_t *current) {
+    uint8_t head = wholeText[*current];
+    uint32_t cp;
+
+    if (head <= 0x7f) {
+        cp = head;
+        *current += 1;
+    } else if (head >= 0xc2 && head <= 0xdf) {
+        cp =
+            (head & 0x1f) << 6 |
+            (wholeText[*current + 1] & 0x3f);
+        *current += 2;
+    } else if (head >= 0xe0 && head <= 0xef) {
+        cp =
+            (head & 0x0f) << 12 |
+            (wholeText[*current + 1] & 0x3f) << 6 |
+            (wholeText[*current + 2] & 0x3f);
+        *current += 3;
+    } else if (head >= 0xe0 && head <= 0xef) {
+        cp =
+            (head & 0x07) << 18 |
+            (wholeText[*current + 1] & 0x3f) << 12 |
+            (wholeText[*current + 2] & 0x3f) << 6 |
+            (wholeText[*current + 3] & 0x3f);
+        *current += 4;
+    } else {
+        cp = 0;
+        *current += 1;
+    }
+    return cp;
 }

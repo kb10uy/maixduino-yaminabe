@@ -94,8 +94,9 @@ int showImage() {
         }
 
         memset(buffer, 0, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
-        jd_decomp(&decoder, jpegio_output, 0);
-        font.render(fileInfo.fname, 0, 0, COLOR888TO565(0, 255, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+        jd_decomp(&decoder, jpegio_output, 1);
+        font.render(fileInfo.fname, 0, 32, COLOR888TO565(0, 255, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+        font.render("漢字もバッチリ", 0, 44, COLOR888TO565(0, 255, 0), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
         oled.setRange(0, 0, 96, 64);
         oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
 
