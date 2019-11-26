@@ -121,7 +121,7 @@ uint8_t r = (static_cast<uint8_t>(color >> 11) & 0b00011111) << 1;
     uint8_t b = (static_cast<uint8_t>(color) & 0b00011111) << 1;
     uint8_t command[] = {
         0x26, 0x00, // Fill disable
-        0x21,
+        0x22,
         x1, y1,
         x2, y2,
         r, g, b,
@@ -141,8 +141,8 @@ void SSD1331::drawFilledBox(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint
     uint8_t fg = (static_cast<uint8_t>(fillColor >> 5) & 0b00111111);
     uint8_t fb = (static_cast<uint8_t>(fillColor) & 0b00011111) << 1;
     uint8_t command[] = {
-        0x26, 0x01, // Fill disable
-        0x21,
+        0x26, 0x01, // Fill enable
+        0x22,
         x1, y1,
         x2, y2,
         r, g, b,

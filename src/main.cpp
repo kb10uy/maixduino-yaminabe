@@ -93,13 +93,13 @@ int showImage() {
             break;
         }
 
+        memset(buffer, 0, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
         jd_decomp(&decoder, jpegio_output, 0);
-        font.render(fileInfo.fname, 0, 0, 0b1111100000000000, buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+        font.render(fileInfo.fname, 0, 0, COLOR888TO565(0, 255, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
         oled.setRange(0, 0, 96, 64);
         oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
 
         f_close(&file);
-
         usleep(1000000);
         status = f_findnext(&root, &fileInfo);
     }
