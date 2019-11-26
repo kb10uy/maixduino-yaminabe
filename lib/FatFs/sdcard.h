@@ -7,9 +7,9 @@
 
 #include "stdint.h"
 
-/** 
-  * @brief  Card Specific Data: CSD Register   
-  */ 
+/**
+  * @brief  Card Specific Data: CSD Register
+  */
 typedef struct {
 	uint8_t  CSDStruct;            /*!< CSD structure */
 	uint8_t  SysSpecVersion;       /*!< System specification version */
@@ -50,8 +50,8 @@ typedef struct {
 	uint8_t  Reserved4;            /*!< always 1*/
 } SD_CSD;
 
-/** 
-  * @brief  Card Identification Data: CID Register   
+/**
+  * @brief  Card Identification Data: CID Register
   */
 typedef struct {
 	uint8_t  ManufacturerID;       /*!< ManufacturerID */
@@ -66,8 +66,8 @@ typedef struct {
 	uint8_t  Reserved2;            /*!< always 1 */
 } SD_CID;
 
-/** 
-  * @brief SD Card information 
+/**
+  * @brief SD Card information
   */
 typedef struct {
 	SD_CSD SD_csd;

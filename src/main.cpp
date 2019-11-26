@@ -2,6 +2,7 @@
 
 uint8_t buffer[SSD1331_WIDTH * SSD1331_HEIGHT * 2] = {0};
 SSD1331 oled(SPI_DEVICE_1, 13, 12, 11);
+TextRenderer font(8, 12);
 FATFS fs;
 
 int main() {
@@ -14,7 +15,7 @@ int main() {
 
     initializeFatFs();
     printf("Filesystem OK\n");
-    
+
     while (true) showImage();
 
     return 0;
@@ -51,6 +52,15 @@ int initializeFatFs() {
     }
     printf("Mounted the filesystem.\n");
     return FR_OK;
+}
+
+int initializeFont() {
+    if (font.loadFont("k8x12.png", "sjtable.dat") != 0) {
+        printf("Failed to load font!\n");
+        return 1;
+    }
+
+    return 0;
 }
 
 int showImage() {
@@ -110,7 +120,7 @@ uint16_t jpegio_input(JDEC *jdec, uint8_t *buff, uint16_t ndata) {
 uint16_t jpegio_output(JDEC *jdec, void *bitmap, JRECT *rect) {
     JpegIOData *data = (JpegIOData *) jdec->device;
     WORD *source = (WORD *) bitmap;
-    
+
     if (rect->left >= data->bufferWidth) {
         return 1;
     }
