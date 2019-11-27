@@ -3,23 +3,24 @@
 void *__dso_handle=0;
 
 uint8_t buffer[SSD1331_WIDTH * SSD1331_HEIGHT * 2] = {0};
-SSD1331 oled(SPI_DEVICE_1, 13, 12, 11);
+SSD1331 oled(SPI_DEVICE_1, 10, 9, 8);
+BME280 atmo(SPI_DEVICE_1, 11);
 TextRenderer font(8, 12);
 FATFS fs;
 
 int main() {
     initializeFPIOA();
     initializeGPIOHS();
-    printf("GPIOHS OK\n");
-
-    oled.initialize();
-    printf("OLED OK\n");
-
     initializeFatFs();
     initializeFont();
-    printf("Filesystem OK\n");
 
-    while (true) showImage();
+    oled.initialize();
+    printf("SSD1331 Ready\n");
+    atmo.initialize();
+    printf("BME280 Ready\n");
+
+    // while (true) showImage();
+    while (true) showAtmosphere();
 
     return 0;
 }
@@ -31,18 +32,25 @@ void initializeFPIOA() {
     fpioa_set_function(MAIXDUINO_SD_MISO_PIN, FUNC_SPI0_D1);
 	fpioa_set_function(MAIXDUINO_SD_CS_PIN, FUNC_GPIOHS7);
 
-    // SSD1331
-    fpioa_set_function(MAIXDUINO_D11_PIN, FUNC_GPIOHS11);
-    fpioa_set_function(MAIXDUINO_D12_PIN, FUNC_GPIOHS12);
-    fpioa_set_function(MAIXDUINO_D13_PIN, FUNC_GPIOHS13);
+    // SPI1
+    fpioa_set_function(MAIXDUINO_D13_PIN, FUNC_SPI1_SCLK);
     fpioa_set_function(MAIXDUINO_SDA_PIN, FUNC_SPI1_D0);
-    fpioa_set_function(MAIXDUINO_SCL_PIN, FUNC_SPI1_SCLK);
+    fpioa_set_function(MAIXDUINO_SCL_PIN, FUNC_SPI1_D1);
+
+    // SSD1331
+    fpioa_set_function(MAIXDUINO_D8_PIN, FUNC_GPIOHS8);
+    fpioa_set_function(MAIXDUINO_D9_PIN, FUNC_GPIOHS9);
+    fpioa_set_function(MAIXDUINO_D10_PIN, FUNC_GPIOHS10);
+
+    // BME280
+    fpioa_set_function(MAIXDUINO_D11_PIN, FUNC_GPIOHS11);
 }
 
 void initializeGPIOHS() {
+    gpiohs_set_drive_mode(8, GPIO_DM_OUTPUT);
+    gpiohs_set_drive_mode(9, GPIO_DM_OUTPUT);
+    gpiohs_set_drive_mode(10, GPIO_DM_OUTPUT);
     gpiohs_set_drive_mode(11, GPIO_DM_OUTPUT);
-    gpiohs_set_drive_mode(12, GPIO_DM_OUTPUT);
-    gpiohs_set_drive_mode(13, GPIO_DM_OUTPUT);
 }
 
 int initializeFatFs() {
@@ -62,6 +70,28 @@ int initializeFont() {
         printf("Failed to load font!\n");
         return 1;
     }
+
+    return 0;
+}
+
+int showAtmosphere() {
+    char string[64];
+    double temp = atmo.temperature();
+    double humidity = atmo.humidity();
+    double pressure = atmo.pressure();
+
+    memset(buffer, 0, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
+
+    sprintf(string, "温度 %2.2f℃", temp);
+    font.render(string, 0, 0, COLOR888TO565(255, 0, 0), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+    sprintf(string, "湿度 %2.2f%%", humidity);
+    font.render(string, 0, 12, COLOR888TO565(0, 255, 0), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+    sprintf(string, "気圧 %4.1fhPa", pressure / 100.0);
+    font.render(string, 0, 24, COLOR888TO565(0, 0, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
+
+    oled.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
+    oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
+    usleep(1000000);
 
     return 0;
 }
@@ -97,7 +127,7 @@ int showImage() {
         jd_decomp(&decoder, jpegio_output, 1);
         font.render(fileInfo.fname, 0, 32, COLOR888TO565(0, 255, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
         font.render("漢字もバッチリ", 0, 44, COLOR888TO565(0, 255, 0), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
-        oled.setRange(0, 0, 96, 64);
+        oled.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
         oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
 
         f_close(&file);
