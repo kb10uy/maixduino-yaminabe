@@ -26,52 +26,16 @@ const uint8_t INITIALIZE_COMMAND[] = {
 /**
  * FPIOA, GPIOHS は正しく設定されていること
  */
-SSD1331::SSD1331(spi_device_num_t spi, uint8_t rst, uint8_t dc, uint8_t cs) {
-    spiNumber = spi;
-    pinReset = rst;
-    pinDataCommand = dc;
-    pinChipSelect = cs;
+SSD1331::SSD1331(spi_device_num_t spi, uint8_t rst, uint8_t dc, uint8_t cs): LCDBase(spi, SSD1331_SPI_FREQ, rst, dc, cs) {
 }
 
 /**
  * OLED を初期化する。
  */
 void SSD1331::initialize() {
-    gpiohs_set_pin(pinReset, GPIO_PV_HIGH);
-    gpiohs_set_pin(pinReset, GPIO_PV_LOW);
-    usleep(1000);
-    gpiohs_set_pin(pinReset, GPIO_PV_HIGH);
-    gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
-    gpiohs_set_pin(pinDataCommand, GPIO_PV_HIGH);
-
+    sendReset();
     sendCommand(INITIALIZE_COMMAND, 37);
     usleep(110000);
-}
-
-/**
- * コマンドを送信する。
- */
-void SSD1331::sendCommand(const uint8_t *command, size_t length) {
-    spi_init(spiNumber, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
-    spi_set_clk_rate(spiNumber, SSD1331_SPI_FREQ);
-
-    gpiohs_set_pin(pinDataCommand, GPIO_PV_LOW);
-    gpiohs_set_pin(pinChipSelect, GPIO_PV_LOW);
-    spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, command, length);
-    gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
-}
-
-/**
- * データ(バッファデータ) を送信する。
- */
-void SSD1331::sendData(const uint8_t *data, size_t length) {
-    spi_init(spiNumber, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
-    spi_set_clk_rate(spiNumber, SSD1331_SPI_FREQ);
-    gpiohs_set_pin(pinDataCommand, GPIO_PV_HIGH);
-    gpiohs_set_pin(pinChipSelect, GPIO_PV_LOW);
-
-    spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, data, length);
-    gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
 }
 
 /**
