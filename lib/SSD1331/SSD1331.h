@@ -14,7 +14,6 @@
 #define SSD1331_SPI_FREQ 5000000UL
 #define SSD1331_WIDTH 96
 #define SSD1331_HEIGHT 64
-#define COLOR888TO565(r, g, b) ((uint16_t) ((r >> 3) << 11 | (g >> 2) << 5 | (b >> 3)))
 
 class SSD1331 : public LCDBase {
 public:

@@ -14,6 +14,7 @@
 
 #include "Maixduino.h"
 #include <SSD1331.h>
+#include <ILI9341.h>
 #include <BME280.h>
 #include <TextRenderer.h>
 #include <ff.h>

@@ -3,7 +3,7 @@
 void *__dso_handle=0;
 
 uint8_t buffer[SSD1331_WIDTH * SSD1331_HEIGHT * 2] = {0};
-SSD1331 oled(SPI_DEVICE_1, 10, 9, 8);
+ILI9341 display(SPI_DEVICE_1, 10, 9, 8);
 BME280 atmo(SPI_DEVICE_1, 11);
 TextRenderer font(8, 12);
 FATFS fs;
@@ -14,7 +14,9 @@ int main() {
     initializeFatFs();
     initializeFont();
 
-    oled.initialize();
+    display.initialize();
+    display.setRotation(3);
+    display.fillBox(0, 0, 320, 240, 0x0000);
     printf("SSD1331 Ready\n");
     atmo.initialize();
     printf("BME280 Ready\n");
@@ -89,8 +91,8 @@ int showAtmosphere() {
     sprintf(string, "気圧 %4.1fhPa", pressure / 100.0);
     font.render(string, 0, 24, COLOR888TO565(0, 0, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
 
-    oled.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
-    oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
+    display.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
+    display.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
     usleep(1000000);
 
     return 0;
@@ -127,8 +129,8 @@ int showImage() {
         jd_decomp(&decoder, jpegio_output, 1);
         font.render(fileInfo.fname, 0, 32, COLOR888TO565(0, 255, 255), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
         font.render("漢字もバッチリ", 0, 44, COLOR888TO565(0, 255, 0), buffer, SSD1331_WIDTH, SSD1331_HEIGHT);
-        oled.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
-        oled.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
+        display.setRange(0, 0, SSD1331_WIDTH, SSD1331_HEIGHT);
+        display.sendData(buffer, SSD1331_WIDTH * SSD1331_HEIGHT * 2);
 
         f_close(&file);
         usleep(1000000);
