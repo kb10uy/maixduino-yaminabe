@@ -7,6 +7,7 @@
 
 #include <spi.h>
 #include <gpiohs.h>
+#include <dmac.h>
 
 #define COLOR888TO565(r, g, b) ((uint16_t) ((r >> 3) << 11 | (g >> 2) << 5 | (b >> 3)))
 

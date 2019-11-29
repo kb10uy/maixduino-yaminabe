@@ -46,6 +46,8 @@ void initializeFPIOA() {
 
     // BME280
     fpioa_set_function(MAIXDUINO_D11_PIN, FUNC_GPIOHS11);
+
+    dmac_init();
 }
 
 void initializeGPIOHS() {

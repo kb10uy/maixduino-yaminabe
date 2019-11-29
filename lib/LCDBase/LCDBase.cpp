@@ -30,10 +30,10 @@ void LCDBase::sendCommandData(uint8_t command, const uint8_t *data, size_t lengt
 
     gpiohs_set_pin(pinChipSelect, GPIO_PV_LOW);
     gpiohs_set_pin(pinDataCommand, GPIO_PV_LOW);
-    spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, &command, 1);
+    spi_send_data_normal_dma(DMAC_CHANNEL0, spiNumber, SPI_CHIP_SELECT_0, &command, 1, SPI_TRANS_CHAR);
     if (data != nullptr && length != 0) {
         gpiohs_set_pin(pinDataCommand, GPIO_PV_HIGH);
-        spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, data, length);
+        spi_send_data_normal_dma(DMAC_CHANNEL0, spiNumber, SPI_CHIP_SELECT_0, data, length, SPI_TRANS_CHAR);
     }
     gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
 }
@@ -47,7 +47,7 @@ void LCDBase::sendCommand(const uint8_t *command, size_t length) {
 
     gpiohs_set_pin(pinDataCommand, GPIO_PV_LOW);
     gpiohs_set_pin(pinChipSelect, GPIO_PV_LOW);
-    spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, command, length);
+    spi_send_data_normal_dma(DMAC_CHANNEL0, spiNumber, SPI_CHIP_SELECT_0, command, length, SPI_TRANS_CHAR);
     gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
 }
 
@@ -60,6 +60,6 @@ void LCDBase::sendData(const uint8_t *data, size_t length) {
 
     gpiohs_set_pin(pinDataCommand, GPIO_PV_HIGH);
     gpiohs_set_pin(pinChipSelect, GPIO_PV_LOW);
-    spi_send_data_standard(spiNumber, SPI_CHIP_SELECT_0, NULL, 0, data, length);
+    spi_send_data_normal_dma(DMAC_CHANNEL0, spiNumber, SPI_CHIP_SELECT_0, data, length, SPI_TRANS_CHAR);
     gpiohs_set_pin(pinChipSelect, GPIO_PV_HIGH);
 }

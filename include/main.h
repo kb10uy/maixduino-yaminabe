@@ -11,6 +11,7 @@
 #include <fpioa.h>
 #include <gpiohs.h>
 #include <spi.h>
+#include <dmac.h>
 
 #include "Maixduino.h"
 #include <SSD1331.h>
